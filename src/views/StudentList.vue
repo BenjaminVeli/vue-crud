@@ -1,18 +1,31 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { getStudents } from '../api/students';
+import { getStudents, deleteStudent } from '../api/students';
 
 const students = ref([]);
 
 onMounted(() => {
-    getStudents()
-        .then(data => {
-            students.value = data;
-        })
-        .catch(error => {
-            console.error('No se pudieron cargar los estudiantes:', error);
-        });
+  getStudents()
+    .then(data => {
+      students.value = data;
+    })
+    .catch(error => {
+      console.error('No se pudieron cargar los estudiantes:', error);
+    });
 });
+
+// Función para eliminar estudiante
+const handleDelete = (studentId) => {
+  deleteStudent({ id: studentId }) // Pasamos el id del estudiante a eliminar
+    .then(() => {
+      // Actualizamos la lista de estudiantes eliminando el estudiante eliminado
+      students.value = students.value.filter(student => student.id !== studentId);
+      console.log(`Estudiante con id ${studentId} eliminado con éxito`);
+    })
+    .catch(error => {
+      console.error('Error al eliminar el estudiante:', error);
+    });
+};
 </script>
 
 <template>
@@ -34,20 +47,19 @@ onMounted(() => {
           <td>{{ student.email }}</td>
           <td>
             <button @click="editStudent(student.id)">Editar</button>
-            <button @click="deleteStudent(student.id)">Eliminar</button>
+            <button @click="handleDelete(student.id)">Eliminar</button>
           </td>
         </tr>
-    </tbody>
-</table>
-<router-link to="/create" class="button-link">Crear un Estudiante</router-link>
+      </tbody>
+    </table>
+    <router-link to="/create" class="button-link">Crear un Estudiante</router-link>
   </div>
 </template>
 
 <style scoped>
-
-.button-link{
-    padding: 10px 20px 10px 20px;
-    background: white;
+.button-link {
+  padding: 10px 20px 10px 20px;
+  background: white;
 }
 
 .container {
@@ -70,7 +82,8 @@ h1 {
   margin-bottom: 40px;
 }
 
-.student-table th, .student-table td {
+.student-table th,
+.student-table td {
   padding: 12px;
   text-align: left;
   border-bottom: 1px solid #ddd;

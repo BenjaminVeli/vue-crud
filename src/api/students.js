@@ -19,3 +19,12 @@ export const postStudent = (studentData) => {
             throw error;
         });
 }
+
+export const deleteStudent = (studentData) => {
+    return axios.delete(`${API_URL}/students/${studentData.id}`, studentData)
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error deleting student: ', error);
+            throw error;
+        });
+}
